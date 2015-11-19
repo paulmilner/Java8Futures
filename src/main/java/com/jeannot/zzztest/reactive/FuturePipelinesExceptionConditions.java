@@ -4,23 +4,24 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Combining results... TODO...
- * 
+ * Simplest version possible. The pipeline of tasks (getSomethingFromDatabase1, followed by getSomethingFromService2)
+ * are executed one after the other, passing futures between...
+ *
  */
-public class FuturePipelinesCombinations {
+public class FuturePipelinesExceptionConditions {
 
 	public static void main(String[] args) {
 		
 		System.out.println("Starting...");
 		
-		FuturePipelinesCombinations play1 = new FuturePipelinesCombinations();
-		play1.doStuff();
+		FuturePipelinesExceptionConditions play1 = new FuturePipelinesExceptionConditions();
+		play1.doSomeBusinessyStuffBetter();
 		
 		System.out.println("Finished.");
 	}
 	
-	private void doStuff() {
-		System.out.println("running doStuff on thread: " + Thread.currentThread().getName());
+	private void doSomeBusinessyStuffBetter() {
+		System.out.println("running doSomeBusinessyStuffBetter on thread: " + Thread.currentThread().getName());
 
 		CompletableFuture<Void> done = CompletableFuture
 			.supplyAsync(()->getSomethingFromDatabase1())
@@ -39,7 +40,6 @@ public class FuturePipelinesCombinations {
 	 */
 	private String getSomethingFromDatabase1() {
 		System.out.println("running getSomethingFromDatabase1 takes a while... on thread: " + Thread.currentThread().getName());
-		System.out.println("am I a daemon? " + Thread.currentThread().isDaemon());
 
 		try {
 			Thread.sleep(2000L);
@@ -48,6 +48,7 @@ public class FuturePipelinesCombinations {
 		}
 		
 		String result = "DB result";
+		System.out.println("running getSomethingFromDatabase1, returns " + result);
 		return result;
 	}
 
@@ -56,9 +57,9 @@ public class FuturePipelinesCombinations {
 	 */
 	private Integer getSomethingFromService2(final String name) {
 		System.out.println("running getSomethingFromService2(" + name + ") takes even longer on thread: " + Thread.currentThread().getName());
-		System.out.println("am I a daemon? " + Thread.currentThread().isDaemon());
 		try {
 			Thread.sleep(1000L);
+			throw new NullPointerException("Ooops"); //Force an unchecked/unexpectable exception...
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
